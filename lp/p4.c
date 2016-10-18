@@ -5,6 +5,8 @@
 // Desarrollo:
 //   Sanchez Hernandez Max Armando
 //   Mares Ontiveros Valeria Fernanda
+
+// IMPORTANTE EJECUTAR CON gcc p4.c -lm
 // Pendientes:
 // - Crear las funciones invPorValRes() invPorVal() angPorValor() angPorRef() angPorValRes()
 // -Terminar funcion invPorRef()
@@ -12,7 +14,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
-
+#define PI 3.141592
 void invPorRef(int * lista, int largo);
 void invPorVal(int lista[], int largo);
 void invPorValRes(int cop[], int largo);
@@ -143,14 +145,14 @@ void angPorRef(int ** vectores, int largo){
  int i;
  float Ax, Ay;
  float AngDis [largo][2];
- for (i=0; i < largo -1; i++)
+ for (i=0; (i+1) < largo ; i++)
  {
 	 Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
 	 Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
    AngDis [i][0] = sqrt(Ay+Ax);
-	 AngDis[i][1]= tan(Ay/ Ax);
+	 AngDis[i][1]= atan(Ay/ Ax)*180/PI;
  }
- for(i=0;i<largo;i++){
- 	printf("Distancia: %f ----: Angulo: %f\n",AngDis[i][0],AngDis[i][1]);
+ for(i=0;i<largo-1;i++){
+ 	printf("Distancia: %.2f ---- Angulo: %.2f\n",AngDis[i][0],AngDis[i][1]);
  }
 }
