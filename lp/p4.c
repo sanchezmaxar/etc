@@ -4,14 +4,19 @@
 // Editor: Atom 1.10.2
 // Desarrollo:
 //   Sanchez Hernandez Max Armando
+//   Mares Ontiveros Valeria Fernanda
 // Pendientes:
 // - Crear las funciones invPorValRes() invPorVal() angPorValor() angPorRef() angPorValRes()
 // -Terminar funcion invPorRef()
 
 #include<stdio.h>
 #include<stdlib.h>
+#include<math.h>
 
 void invPorRef(int * lista, int largo);
+void invPorVal(int lista[], int largo);
+void invPorValRes(int cop[], int largo);
+void angPorRef(int ** vectores, int largo);
 int main(){
 	char opc1,opc2;
 	int *list;
@@ -43,7 +48,7 @@ int main(){
 			}
 			break;
 	}
-	// hasta aqui bien
+	// hasta aqui bien1
 	printf("Que tipo de paso de parametros quieres ejecutar?\n");
 	printf("1) Por referencia\n2) Valor resultado\n3) valor\n\topcion: ");
 	scanf("%c",&opc2);//scanf extra para sistemas linux comentar en otro
@@ -52,25 +57,25 @@ int main(){
 		case '1':
 			if (opc2=='1')
 				invPorRef(list,n);
-			// else if (opc2=='2')
-			// 	invPorValRes();
-			// else
-			// 	invPorValor();
+			else if (opc2=='2')
+				invPorValRes(list,n);
+			else
+				invPorVal(list,n);
 			printf("\nAl salir:\t");
 			for(i=0;i<n;i++){
 				printf("%d ",list[i]);
 			}
 			break;
-		// case '2':
-		// 	if (opc2=='1')
-		// 		angPorRef();
+		 case '2':
+		 	if (opc2=='1')
+				angPorRef(vects,n);
 		// 	else if (opc2=='2')
 		// 		angPorValRes();
 		// 	else
 		// 		angPorValor();
 		// 	break;
 	}
-	//prueba
+	// prueba
 	// for(i=0;i<n;i++){
 	// 	printf("vector %d: x: %d y: %d\n",i+1,vects[i][0],vects[i][1]);
 	// }
@@ -84,7 +89,7 @@ void invPorRef(int * lista, int largo){
 	for(i=0;i<largo;i++){
 		printf("%d ",lista[i]);
 	}
-	for(i=0;i<(largo/2);i++){//PROBAR LARGO/2 CON NUMEROS IMPARES
+	for(i=0;i<(largo/2);i++){
 		aux=lista[i];
 		lista[i]=lista[largo-i-1];
 		lista[largo-i-1]=aux;
@@ -93,4 +98,59 @@ void invPorRef(int * lista, int largo){
 	for(i=0;i<largo;i++){
 		printf("%d ",lista[i]);
 	}
+}//yasta x2
+void invPorVal(int cop[], int largo){
+	int aux,i;
+	int lista[largo];
+	for(i=0;i<largo;i++)
+		lista[i]=cop[i];
+	printf("\nAntes:\t\t");
+	for(i=0;i<largo;i++){
+		printf("%d ",lista[i]);
+	}
+	for(i=0;i<(largo/2);i++){
+		aux=lista[i];
+		lista[i]=lista[largo-i-1];
+		lista[largo-i-1]=aux;
+	}
+	printf("\nDespues:\t");
+	for(i=0;i<largo;i++){
+		printf("%d ",lista[i]);
+	}
+}//yasta//yasta
+void invPorValRes(int cop[], int largo){
+	int aux,i;
+	int lista[largo];
+	for(i=0;i<largo;i++)
+		lista[i]=cop[i];
+	printf("\nAntes:\t\t");
+	for(i=0;i<largo;i++){
+		printf("%d ",lista[i]);
+	}
+	for(i=0;i<(largo/2);i++){
+		aux=lista[i];
+		lista[i]=lista[largo-i-1];
+		lista[largo-i-1]=aux;
+	}
+	printf("\nDespues:\t");
+	for(i=0;i<largo;i++){
+		printf("%d ",lista[i]);
+	}
+	for(i=0;i<largo;i++)
+		cop[i]=lista[i];
+}//yasta//yasta
+void angPorRef(int ** vectores, int largo){
+ int i;
+ float Ax, Ay;
+ float AngDis [largo][2];
+ for (i=0; i < largo -1; i++)
+ {
+	 Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
+	 Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
+   AngDis [i][0] = sqrt(Ay+Ax);
+	 AngDis[i][1]= tan(Ay/ Ax);
+ }
+ for(i=0;i<largo;i++){
+ 	printf("Distancia: %f ----: Angulo: %f\n",AngDis[i][0],AngDis[i][1]);
+ }
 }
