@@ -18,70 +18,80 @@
 void invPorRef(int * lista, int largo);
 void invPorVal(int lista[], int largo);
 void invPorValRes(int cop[], int largo);
-void angPorRef(int ** vectores, int largo);
+void angPorRef(float **angs,int ** vectores, int largo);
+void angPorValRes(float **angs,int ** vectores, int largo);
+void angPorVal(float **AngDis,int ** vectores, int largo);
 int main(){
-	char opc1,opc2;
+	char opc1,opc2,repetir='s';
 	int *list;
 	int n,i;
 	int **vects;
-	printf("\n\nMenu\n\n");
-	printf("1)Reversa de una lista\n2)Angulo y distancia\n\tOpcion: ");
-	scanf("%c",&opc1);
-	switch( opc1){
-		case '1':
-			printf("Introduce el numero de elementos de la lista: " );
-			scanf("%d",&n);
-			list=(int*)malloc(n*sizeof(int));
-			for (i=0;i<n;i++){
-				printf("\nDame el elemento %d de la lista: ",i+1);
-				scanf("%d",list+i);
-			}
-			break;
-		case '2':
-			printf("Cuantos puntos quieres: ");
-			scanf("%d",&n);
-			vects=(int**)malloc(n*sizeof(int*));
-			for(i=0;i<n;i++){
-					*(vects+i)=(int*)malloc(2*sizeof(int));
-					printf("%i) X : ",i+1 );
-					scanf("%d",*(vects+i));
-					printf("%i) Y : ",i+1 );
-					scanf("%d",*(vects+i)+1);
-			}
-			break;
+	float **angs;//vectores y angulos
+		while(repetir!='n'){
+		printf("\n\nMenu\n\n");
+		printf("1)Reversa de una lista\n2)Angulo y distancia\n\tOpcion: ");
+		scanf("%c",&opc1);
+		switch( opc1){
+			case '1':
+				printf("Introduce el numero de elementos de la lista: " );
+				scanf("%d",&n);
+				list=(int*)malloc(n*sizeof(int));
+				for (i=0;i<n;i++){
+					printf("\nDame el elemento %d de la lista: ",i+1);
+					scanf("%d",list+i);
+				}
+				break;
+			case '2':
+				printf("Cuantos puntos quieres: ");
+				scanf("%d",&n);
+				vects=(int**)malloc(n*sizeof(int*));
+				angs=(float**)malloc(n*sizeof(float*));
+				for(i=0;i<n;i++){
+						*(vects+i)=(int*)malloc(2*sizeof(int));
+						*(angs+i)=(float*)malloc(2*sizeof(float));
+						printf("%i) X : ",i+1 );
+						scanf("%d",*(vects+i));
+						printf("%i) Y : ",i+1 );
+						scanf("%d",*(vects+i)+1);
+				}
+				break;
+		}
+		printf("Que tipo de paso de parametros quieres ejecutar?\n");
+		printf("1) Por referencia\n2) Valor resultado\n3) valor\n\topcion: ");
+		// scanf("%c",&opc2);//scanf extra para sistemas linux comentar en otro
+		scanf("%c",&opc2);
+		switch (opc1){
+			case '1':
+				if (opc2=='1')
+					invPorRef(list,n);
+				else if (opc2=='2')
+					invPorValRes(list,n);
+				else
+					invPorVal(list,n);
+				printf("\nAl salir:\t");
+				for(i=0;i<n;i++){
+					printf("%d ",list[i]);
+				}
+				break;
+			 case '2':
+			 	printf("Arreglo de angulos y distancias ANTES:\n");
+	 			for(i=0;i<n;i++)
+	 			printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,angs[i][0],angs[i][1]);
+			 	if (opc2=='1')
+					angPorRef(angs, vects,n);
+				else if (opc2=='2')
+					angPorValRes(angs,vects,n);
+				else
+					angPorVal(angs,vects,n);
+			printf("Arreglo de angulos y distancias DESPUES:\n");
+			for(i=0;i<n;i++)
+				printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,angs[i][0],angs[i][1]);
+				break;
+		}
+		printf("Deseas repetir la ejecucion?(s/n): ");
+		scanf("%c",&repetir);
+		// scanf("%c",&repetir);//esta linea se repite para su ejecucion en linux
 	}
-	// hasta aqui bien1
-	printf("Que tipo de paso de parametros quieres ejecutar?\n");
-	printf("1) Por referencia\n2) Valor resultado\n3) valor\n\topcion: ");
-	scanf("%c",&opc2);//scanf extra para sistemas linux comentar en otro
-	scanf("%c",&opc2);
-	switch (opc1){
-		case '1':
-			if (opc2=='1')
-				invPorRef(list,n);
-			else if (opc2=='2')
-				invPorValRes(list,n);
-			else
-				invPorVal(list,n);
-			printf("\nAl salir:\t");
-			for(i=0;i<n;i++){
-				printf("%d ",list[i]);
-			}
-			break;
-		 case '2':
-		 	if (opc2=='1')
-				angPorRef(vects,n);
-		// 	else if (opc2=='2')
-		// 		angPorValRes();
-		// 	else
-		// 		angPorValor();
-		// 	break;
-	}
-	// prueba
-	// for(i=0;i<n;i++){
-	// 	printf("vector %d: x: %d y: %d\n",i+1,vects[i][0],vects[i][1]);
-	// }
-
 	return 0;
 }
 
@@ -141,10 +151,9 @@ void invPorValRes(int cop[], int largo){
 	for(i=0;i<largo;i++)
 		cop[i]=lista[i];
 }//yasta//yasta
-void angPorRef(int ** vectores, int largo){
+void angPorRef(float **AngDis,int ** vectores, int largo){
  int i;
  float Ax, Ay;
- float AngDis [largo][2];
  for (i=0; (i+1) < largo ; i++)
  {
 	 Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
@@ -152,7 +161,44 @@ void angPorRef(int ** vectores, int largo){
    AngDis [i][0] = sqrt(Ay+Ax);
 	 AngDis[i][1]= atan(Ay/ Ax)*180/PI;
  }
- for(i=0;i<largo-1;i++){
- 	printf("Distancia: %.2f ---- Angulo: %.2f\n",AngDis[i][0],AngDis[i][1]);
+ printf("Arreglo de angulos y distancias EN LA FUNCION\n");
+ for(i=0;i<largo-1;i++)
+ 	printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,AngDis[i][0],AngDis[i][1]);
+}
+void angPorValRes(float **AngDis,int ** vectores, int largo){
+ int i;
+ float Ax, Ay;
+	float** AngDis2;
+	AngDis2=(float **)malloc(largo*sizeof( float *));
+ for (i=0; (i+1) < largo ; i++)
+ {
+	 *(AngDis2+i)=(float *)malloc(2*sizeof(float));
+	 Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
+	 Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
+   AngDis2 [i][0] = sqrt(Ay+Ax);
+	 AngDis2[i][1]= atan(Ay/ Ax)*180/PI;
  }
+ printf("Arreglo de angulos y distancias EN LA FUNCION\n" );
+ for(i=0;i<largo-1;i++){
+ 	printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,AngDis2[i][0],AngDis2[i][1]);
+	AngDis[i][0] = AngDis2 [i][0];
+	AngDis[i][1]= AngDis2[i][1];
+ }
+}
+
+void angPorVal(float **AngDis,int ** vectores, int largo){
+	int i;
+	float Ax, Ay;
+	float** AngDis2;
+	AngDis2=(float **)malloc(largo*sizeof( float *));
+	for (i=0; (i+1) < largo ; i++){
+		*(AngDis2+i)=(float *)malloc(2*sizeof(float));
+		Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
+		Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
+		AngDis2 [i][0] = sqrt(Ay+Ax);
+		AngDis2[i][1]= atan(Ay/ Ax)*180/PI;
+	}
+	printf("Arreglo de angulos y distancias EN LA FUNCION\n" );
+	for(i=0;i<largo-1;i++)
+		printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,AngDis2[i][0],AngDis2[i][1]);
 }
