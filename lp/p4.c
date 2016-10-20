@@ -7,10 +7,9 @@
 //   Mares Ontiveros Valeria Fernanda
 //   Velazquez Sanchez Jose Antonio
 
-// IMPORTANTE EJECUTAR CON gcc p4.c -lm
+// IMPORTANTE EJECUTAR CON EN LINUX  gcc p4.c -lm
 // Pendientes:
-// - Crear las funciones invPorValRes() invPorVal() angPorValor() angPorRef() angPorValRes()
-//  -Terminar funcion invPorRef()
+
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -76,7 +75,7 @@ int main(){
 				break;
 			 case '2':
 			 	printf("Arreglo de angulos y distancias ANTES:\n");
-	 			for(i=0;i<n;i++)
+	 			for(i=0;i<n-1;i++)
 	 			printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,angs[i][0],angs[i][1]);
 			 	if (opc2=='1')
 					angPorRef(angs, vects,n);
@@ -85,7 +84,7 @@ int main(){
 				else
 					angPorVal(angs,vects,n);
 			printf("Arreglo de angulos y distancias DESPUES:\n");
-			for(i=0;i<n;i++)
+			for(i=0;i<n-1;i++)
 				printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,angs[i][0],angs[i][1]);
 				break;
 		}
@@ -123,7 +122,7 @@ void invPorVal(int cop[], int largo){
 	utilizando el paso de parámetros por valor.
 	Esto se hace en C simplemente al no utilizar
 	apuntadores*/
-	
+
 	int aux,i;
 	int lista[largo];
 	for(i=0;i<largo;i++)
@@ -148,7 +147,7 @@ void invPorValRes(int cop[], int largo){
 	al actualizar la lista original solo hasta el final
 	de la función. Esto, ya que C no soporta de manera nativa
 	el paso por valor-resultado*/
-	
+
 	int aux,i;
 	int lista[largo];
 	for(i=0;i<largo;i++)
@@ -221,11 +220,11 @@ void angPorVal(float **AngDis,int ** vectores, int largo){
 	/* Realiza la operación de encontrar la distancia y
 	angulos dentro de una lista de puntos,
 	utilizando el paso de parámetros por valor.
-	
+
 	Como las matrices originales no deben ser modificadas,
 	se copian dentro de la función para que así solo
 	se afecten dentro de la misma.*/
-	
+
 	int i;
 	float Ax, Ay;
 	float** AngDis2;
