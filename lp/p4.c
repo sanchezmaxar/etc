@@ -5,11 +5,12 @@
 // Desarrollo:
 //   Sanchez Hernandez Max Armando
 //   Mares Ontiveros Valeria Fernanda
+//   Velazquez Sanchez Jose Antonio
 
 // IMPORTANTE EJECUTAR CON gcc p4.c -lm
 // Pendientes:
 // - Crear las funciones invPorValRes() invPorVal() angPorValor() angPorRef() angPorValRes()
-// -Terminar funcion invPorRef()
+//  -Terminar funcion invPorRef()
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -96,12 +97,18 @@ int main(){
 }
 
 void invPorRef(int * lista, int largo){
+	/* Realiza la operación de inversión de una lista
+	utilizando el paso de parámetros por referencia.
+	Esto se hace en C simplemente al utilizar un apuntador
+	a la lista que se ha de modificar*/
 	int aux,i;
 	printf("\nAntes:\t\t");
 	for(i=0;i<largo;i++){
 		printf("%d ",lista[i]);
 	}
 	for(i=0;i<(largo/2);i++){
+		// La lista original se actualiza automáticamente
+		// ya que se trabaja con un apuntador.
 		aux=lista[i];
 		lista[i]=lista[largo-i-1];
 		lista[largo-i-1]=aux;
@@ -112,6 +119,11 @@ void invPorRef(int * lista, int largo){
 	}
 }//yasta x2
 void invPorVal(int cop[], int largo){
+	/* Realiza la operación de inversión de una lista
+	utilizando el paso de parámetros por valor.
+	Esto se hace en C simplemente al no utilizar
+	apuntadores*/
+	
 	int aux,i;
 	int lista[largo];
 	for(i=0;i<largo;i++)
@@ -131,6 +143,12 @@ void invPorVal(int cop[], int largo){
 	}
 }//yasta//yasta
 void invPorValRes(int cop[], int largo){
+	/* Realiza la operación de inversión de una lista
+	utilizando el paso de parámetros por valor-resultado
+	al actualizar la lista original solo hasta el final
+	de la función. Esto, ya que C no soporta de manera nativa
+	el paso por valor-resultado*/
+	
 	int aux,i;
 	int lista[largo];
 	for(i=0;i<largo;i++)
@@ -152,41 +170,62 @@ void invPorValRes(int cop[], int largo){
 		cop[i]=lista[i];
 }//yasta//yasta
 void angPorRef(float **AngDis,int ** vectores, int largo){
- int i;
- float Ax, Ay;
- for (i=0; (i+1) < largo ; i++)
- {
-	 Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
-	 Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
-   AngDis [i][0] = sqrt(Ay+Ax);
-	 AngDis[i][1]= atan(Ay/ Ax)*180/PI;
- }
- printf("Arreglo de angulos y distancias EN LA FUNCION\n");
- for(i=0;i<largo-1;i++)
- 	printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,AngDis[i][0],AngDis[i][1]);
+	/* Realiza la operación de encontrar la distancia y
+	angulos dentro de una lista de puntos,
+	utilizando el paso de parámetros por referencia.
+	Esto se hace en C simplemente al utilizar un apuntador
+	de apuntadores*/
+	 int i;
+	 float Ax, Ay;
+	 for (i=0; (i+1) < largo ; i++)
+	 {
+		 // Las matrices originales de actualizan automáticamente ya que
+		 // se utilizan los apuntadores
+		 Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
+		 Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
+	   AngDis [i][0] = sqrt(Ay+Ax);
+		 AngDis[i][1]= atan(Ay/ Ax)*180/PI;
+	 }
+	 printf("Arreglo de angulos y distancias EN LA FUNCION\n");
+	 for(i=0;i<largo-1;i++)
+		printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,AngDis[i][0],AngDis[i][1]);
 }
+
 void angPorValRes(float **AngDis,int ** vectores, int largo){
- int i;
- float Ax, Ay;
+	/* Realiza la operación de encontrar la distancia y
+	angulos dentro de una lista de puntos,
+	utilizando el paso de parámetros por valor-resultado.
+	Esto se hace en C actualizando las matrices originales
+	solo al finalizar la ejecución de la función*/
+	int i;
+	float Ax, Ay;
 	float** AngDis2;
 	AngDis2=(float **)malloc(largo*sizeof( float *));
- for (i=0; (i+1) < largo ; i++)
- {
-	 *(AngDis2+i)=(float *)malloc(2*sizeof(float));
-	 Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
-	 Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
-   AngDis2 [i][0] = sqrt(Ay+Ax);
-	 AngDis2[i][1]= atan(Ay/ Ax)*180/PI;
- }
- printf("Arreglo de angulos y distancias EN LA FUNCION\n" );
- for(i=0;i<largo-1;i++){
- 	printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,AngDis2[i][0],AngDis2[i][1]);
-	AngDis[i][0] = AngDis2 [i][0];
-	AngDis[i][1]= AngDis2[i][1];
- }
+	for (i=0; (i+1) < largo ; i++)
+	{
+		*(AngDis2+i)=(float *)malloc(2*sizeof(float));
+		Ax= (vectores [i][0]-vectores[i+1][0]) * (vectores [i][0]-vectores[i+1][0]);
+		Ay= (vectores [i][1]-vectores[i+1][1]) * (vectores [i][1]-vectores[i+1][1]);
+	   	AngDis2 [i][0] = sqrt(Ay+Ax);
+		AngDis2[i][1]= atan(Ay/ Ax)*180/PI;
+	 }
+	 printf("Arreglo de angulos y distancias EN LA FUNCION\n" );
+	 for(i=0;i<largo-1;i++){
+		printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,AngDis2[i][0],AngDis2[i][1]);
+		AngDis[i][0] = AngDis2 [i][0];
+		AngDis[i][1]= AngDis2[i][1];
+	 }
 }
 
 void angPorVal(float **AngDis,int ** vectores, int largo){
+	/* Realiza la operación de encontrar la distancia y
+	angulos dentro de una lista de puntos,
+	utilizando el paso de parámetros por valor.
+	
+	Como las matrices originales no deben ser modificadas,
+	se copian dentro de la función para que así solo
+	se afecten dentro de la misma.*/
+	
 	int i;
 	float Ax, Ay;
 	float** AngDis2;
