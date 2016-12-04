@@ -1,0 +1,205 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname ultmoProg) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+ (require racket/bool)
+#| 
+DrRacket es un programa que consiste en varias partes. Una función verifica si 
+las definiciones y expresiones escritas son expresiones gramaticales Racket, 
+otra evalúa dichas expresiones. Es factible desarrollar versiones simples de 
+tales funciones.
+
+Lo primero que se requiere desarrollar es una representación para los 
+programas Racket. En otras palabras, se debe representar una expresión Racket 
+como una pieza de datos Racket. Supóngase que para empezar se desea representar 
+números, variables, sumas y multiplicaciones; los números pueden representar 
+números y los símbolos, variables; sumas y multiplicaciones, sin embargo, 
+requieren una clase de datos compuestos, ya que consisten de un operador y dos 
+subexpresiones.
+
+Una forma directa de representar sumas y multiplicaciones es emplear dos 
+estructuras: una para sumas y otra para multiplicaciones. Dichas definiciones 
+de estructuras son:
+
+	(define-struct sum (izq der))
+	(define-struct mul (izq der))
+
+Analizar algunos ejemplos:
+
+Dichos ejemplos cubren todos los casos: números, variables, expresiones simples,
+ y expresiones recursivas.
+
+Expresión Racket 	representación de una expresión Racket
+3	                 3
+x	                'x
+(* 3 10)	        (make-mul 3 10)
+(+ (* 3 3) (* 4 4))	(make-sum (make-mul 3 3) (make-mul 4 4))
+(+ (* x x) (* y y))	(make-sum (make-mul 'x 'x) (make-mul 'y 'y))
+(* 1/2 (* 3 3))	        (make-mul 1/2 (make-mul 3 3))
+
+Nota: En Racket si se antepone un ' a una letra es un symbol
+
+(A) Desarrollar una definición de datos para la representación de expresiones 
+Racket.
+
+(B) Desarrollar la función evaluar. La función consume (la representación de) 
+una expresión numérica y calcula su valor.
+Cuando se haya probado la función, modificarla para que consuma todo tipo 
+de expresiones; la versión revisada marca un error cuando encuentra una variable.
+
+(C) Cuando se evalúan expresiones con variables, se sustituyen variables con 
+valores.
+Desarrollar la función subst. Consume (la representación de) una expresión 
+Racket, (la representación de) una variable (v) y un número (n). Produce una 
+expresión estructuralmente equivalente en la cual todas las ocurrencias de v 
+son sustituidas por n.
+
+Además, (B) y (C) deben implementarse también en un lenguaje imperativo
+|#
+
+(define-struct sum (izq der))
+(define-struct mul (izq der))
+(define-struct conj (izq der))
+(define-struct disy (izq der))
+(define-struct igual (izq der))
+(define-struct diff (izq der))
+(define-struct mayq (izq der))
+(define-struct menq (izq der))
+(define-struct mayqi (izq der))
+(define-struct menqi (izq der))
+(define-struct orx (izq der))
+(define-struct no (un))
+;(A) Definición de datos para la representación de expresiones 
+;Una exp-num es
+; número
+; (make-sum exp-num exp-num)
+; (make-mul exp-num exp-num)
+;Formato de función para exp-num
+; (define (evaluar en)
+;   (cond
+;     [(number? en) en ]
+;     [(sum? en)(+ (evaluar (sum-izq en))
+;                    (evaluar (sum-der en)))]
+;     [(mul? en) (* (evaluar (mul-izq en))
+;                    (evaluar (mul-der en)))]))
+(define (evaluar en )
+	(if (algunSimbolo en )
+		"No se puede evaluar"
+		(evaluar2 en)
+		))
+
+(define (evaluar2 en)
+  (cond
+    [(number? en) en ]
+    [(boolean? en ) en]
+    [(sum? en)(+ (evaluar (sum-izq en))
+                   (evaluar (sum-der en)))]
+    [(mul? en) (* (evaluar (mul-izq en))
+                   (evaluar (mul-der en)))]
+    [(conj? en) (and (evaluar (conj-izq en ))
+    				(evaluar (conj-der en )))]
+    [(disy? en) (or (evaluar (disy-izq en ))
+    				(evaluar (disy-der en )))]
+   	[(igual? en) (eq? (evaluar (igual-izq en ))
+    				(evaluar (igual-der en )))]
+   	[(diff? en) (\= (evaluar (diff-izq en ))
+    				(evaluar (diff-der en )))]
+   	[(mayq? en) (> (evaluar (mayq-izq en ))
+    				(evaluar (mayq-der en )))]
+   	[(menq? en) (< (evaluar (menq-izq en ))
+    				(evaluar (menq-der en )))]
+   	[(mayqi? en) (>= (evaluar (mayqi-izq en ))
+    				(evaluar (mayqi-der en )))]
+   	[(menqi? en) (<= (evaluar (menqi-izq en ))
+    				(evaluar (menqi-der en )))]
+   	[(orx? en) (xor (evaluar (orx-izq en ))
+    				(evaluar (orx-der en )))]
+   	[(no? en) (not (evaluar (no-un en )))]
+   	
+   	)
+)
+;algunSimbolo
+;procesa una expresion 
+;dice si tiene algun simbolo
+
+(define (algunSimbolo expresion )
+	(cond 
+		[(sum? expresion) (or (algunSimbolo (sum-izq expresion))(algunSimbolo (sum-der expresion)))]
+		[(mul? expresion) (or (algunSimbolo (mul-izq expresion))(algunSimbolo (mul-der expresion)))]
+		[(symbol? expresion) true ]
+		[else false ]
+		)
+	)
+
+
+;(B.1)Desarrollar la función evaluar. La función consume (la 
+;representación de) una expresión numérica y calcula su valor.
+;Consume una expresión numérica en
+;Produce el valor de la en
+;Ejemplos:
+;(evaluar 5) -> 5
+;(evaluar (make-sum 3 5) -> 8
+;(evaluar (make-sum (make-mul 3 3) (make-mul 4 4))) -> 25
+(check-expect (evaluar 5) 5)
+(check-expect (evaluar (make-sum 3 5)) 8)
+(check-expect (evaluar (make-sum (make-mul 3 3) (make-mul 4 4))) 25)
+
+;(B.2)
+;Cuando se haya probado la función, modificarla para que consuma todo tipo 
+;de expresiones
+;la versión revisada marca un error cuando encuentra una variable.
+;TIP: Utiliza una función auxiliar que ayude a decidir si una expresión contiene
+;     sólo números ó no
+(check-expect (evaluar 5) 5)
+(check-expect (evaluar 'x) "No se puede evaluar")
+(check-expect (evaluar (make-sum 3 5)) 8)
+(check-expect (evaluar (make-mul 3 5)) 15)
+(check-expect (evaluar (make-sum 3 'z)) "No se puede evaluar")
+(check-expect (evaluar (make-mul 'x 'y)) "No se puede evaluar")
+(check-expect (evaluar (make-conj #t #t )) #t)
+(evaluar (make-no #f))
+(evaluar (make-orx #f #t))
+
+
+;es-en?
+;Consume: una expresion
+;Produce: la expresion con numeros sustituyendo los simbolos, si no es exitoda regresa false
+;Programa
+;(C)
+;subst
+(define (subst exp simb n)
+	(cond 
+		[(number? exp ) exp]
+		[(boolean? exp) exp]
+		[(symbol? exp) (if (eq? exp simb) n exp)]
+		[(sum? exp) (make-sum (subst (sum-izq exp) simb n) (subst (sum-der exp) simb n))]
+		[(mul? exp) (make-mul (subst (mul-izq exp) simb n) (subst (mul-der exp) simb n))]
+		[(conj? exp) (make-conj (subst (conj-izq exp) simb n) (subst (conj-der exp) simb n))]
+		[(disy? exp) (make-disy (subst (disy-izq exp) simb n) (subst (disy-der exp) simb n))]
+		[(igual? exp) (make-igual (subst (igual-izq exp) simb n) (subst (igual-der exp) simb n))]
+		[(diff? exp) (make-diff (subst (diff-izq exp) simb n) (subst (diff-der exp) simb n))]
+		[(mayq? exp) (make-mayq (subst (mayq-izq exp) simb n) (subst (mayq-der exp) simb n))]
+		[(menq? exp) (make-menq (subst (menq-izq exp) simb n) (subst (menq-der exp) simb n))]
+		[(mayqi? exp) (make-mayqi (subst (mayqi-izq exp) simb n) (subst (mayqi-der exp) simb n))]
+		[(menqi? exp) (make-menqi (subst (menqi-izq exp) simb n) (subst (menqi-der exp) simb n))]
+		[(orx? exp) (make-orx (subst (orx-izq exp) simb n) (subst (orx-der exp) simb n))]
+		[(no? exp) (make-no (subst (no-un exp) simb n)) ]
+		[else exp]
+		)
+
+)
+
+(check-expect (subst 5 'x 2) 5)
+(check-expect (subst 'x 'x 2) 2)
+; (check-expect (subst (make-sum 3 5) 'x 2) (make-sum 3 5))
+(check-expect (evaluar(subst (make-sum 3 5) 'x 2)) (evaluar(make-sum 3 5)))
+(make-sum 3 5)
+(subst (make-sum 3 5) 'x 2)
+(check-expect (subst (make-sum (make-mul 3 'x) (make-mul 4 'x)) 'x 2)
+               (make-sum (make-mul 3 2) (make-mul 4 2)))
+ (check-expect (subst (make-sum (make-mul 'x 'y) (make-mul 'x 'z)) 'x 2)
+               (make-sum (make-mul 2 'y) (make-mul 2 'z)))
+ (check-expect (evaluar (subst (make-sum (make-mul 3 'x) (make-mul 4 'x)) 'x 2))
+               (evaluar(make-sum (make-mul 3 2) (make-mul 4 2))))
+ (check-expect (evaluar (subst (make-sum (make-mul 'x 'y) (make-mul 'x 'z)) 'x 2))
+               (evaluar(make-sum (make-mul 2 'y) (make-mul 2 'z))))
+

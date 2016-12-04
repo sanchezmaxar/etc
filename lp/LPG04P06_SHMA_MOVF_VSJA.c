@@ -84,7 +84,7 @@ int main(){
 				else
 					angPorVal(angs,vects,n);
 			printf("Arreglo de angulos y distancias DESPUES:\n");
-			for(i=0;i<n-1asa	;i++)
+			for(i=0;i<n-1;i++)
 				printf("\t%d) distancia: %.2f angulo: %.2f\n",i+1,angs[i][0],angs[i][1]);
 				break;
 		}
