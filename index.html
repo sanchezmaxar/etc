@@ -13,6 +13,28 @@
             display: flex;
             width: 100%;
         }
+
+        .row-input {
+            display: inline-flex;
+            height: fit-content;
+            align-items: center;
+            width: 100%;
+        }
+
+        .search-input {
+            height: fit-content;
+            flex: 1;
+            display: block;
+            min-width: 0;
+        }
+
+        .wrong-url {
+            border-color: red;
+        }
+
+        .good-url {
+            border-color: green;
+        }
     </style>
 
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -21,7 +43,116 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
+        async function test(url) {
+
+            if (window.fetch) {
+                // must be chrome or firefox which have native fetch
+                try {
+
+                    await fetch(url, { 'mode': 'no-cors' })
+                    return true;
+                } catch {
+                    return false;
+                }
+
+            } else {
+                return false;
+            }
+        }
+
+        async function urlExist(url) {
+            try {
+                const res = await test(url);
+                return res;
+            }
+            catch (err) {
+                console.log("Not found", err);
+            }
+
+            return false;
+        }
+
+        function isValidHttpUrl(string) {
+            let url;
+
+            try {
+                url = new URL(string);
+            } catch (_) {
+                return false;
+            }
+
+            return url.protocol === "http:" || url.protocol === "https:";
+        }
+
+        function makeSureValid(url) {
+            while (url) {
+                if (isValidHttpUrl(url))
+                    return url;
+                url = url.substring(0, url.length - 1);
+            }
+            return url;
+        }
+
+        function clearErrors() {
+            $("#div-errores").html(" <h3>Errores: </h1>");
+        }
+
+        function showErrors(failed) {
+            clearErrors();
+            let count = 1;
+            const div = $("#div-errores");
+
+            for (const fail of failed) {
+
+                const template = `
+            <div class="row-input ">
+                
+                <input id="input-${count}" class="search-input wrong-url" value="${fail} ">
+                <div class="p-2">
+                    <a class="btn btn-primary btn-sm single-search" id="search-${count}" name="${count++}"> Buscar</a>
+                    </div>
+                    </div>`;
+                div.append(template);
+            }
+        }
+
+        async function searchOne(busqueda, isDirect) {
+            if (!isDirect) {
+                url = `https://www.google.com/search?q=${busqueda}`;
+
+            }
+            else {
+                url = `https://${busqueda}`;
+            }
+            urlbk = url;
+            url = makeSureValid(url)
+            exist = await urlExist(url);
+            if (url && exist) {
+                window.open(url, '_blank');
+                return { success: true }
+            }
+            else {
+                return { success: false, url: urlbk };
+            }
+        }
+
         $(document).ready(function () {
+            $("#div-errores").on("click", ".single-search", async (e) => {
+                const id = +(e.target.name);
+                let busqueda = $(`#input-${id}`).val();
+                busqueda=busqueda.replace("https://","")
+                busqueda=busqueda.replace("http://","")
+                const res = await searchOne(busqueda, true);
+                if (res.success) {
+                    $(`#input-${id}`).removeClass("wrong-url")
+                    $(`#input-${id}`).addClass("good-url")
+                }
+                else {
+                    $(`#input-${id}`).addClass("wrong-url")
+                    $(`#input-${id}`).removeClass("good-url")
+                }
+            })
+
 
             $("#search").click(async () => {
 
@@ -33,7 +164,7 @@
             })
 
 
-            $("#searchCorreos").click(function () {
+            $("#searchCorreos").click(async () => {
 
                 let busquedas = $("#textAreaCorreos").val()
                     .split('\n')
@@ -44,42 +175,46 @@
                     busquedas = new Set(busquedas);
                 }
                 const isDirect = $("#openDomain").prop("checked");
+                let url;
+                const failed = [];
                 for (const busqueda of busquedas) {
-                    if (!isDirect) {
-
-                        window.open(`https://www.google.com/search?q=${busqueda}`, '_blank');
-                    }
-                    else {
-                        window.open(`https://${busqueda}`, '_blank');
-                    }
+                    const res = await searchOne(busqueda, isDirect);
+                    if (!res.success)
+                        failed.push(res.url);
                     await sleep(1000);
+
                 }
+                showErrors(failed);
             })
         });
     </script>
 </header>
 
 <body>
-    <div class="p-2">
-        <form>
+    <div class="container">
 
-            <div class="form-group w-50">
-                <h3>Buscar Frases: </h1>
-                    <textarea class="form-control" id="textArea" rows="10"></textarea>
-            </div>
-            <div class="d-inline-flex">
+        <div class="p-2">
+            <form>
 
-                <a class="btn btn-primary" id="search"> Buscar</a>
-            </div>
-        </form>
+                <div class="form-group w-50">
+                    <h3>Buscar Frases: </h1>
+                        <textarea class="form-control" id="textArea" rows="10"></textarea>
+                </div>
+                <div class="d-inline-flex">
+
+                    <a class="btn btn-primary" id="search"> Buscar</a>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="p-2">
-        <form>
+    <div class="container w-100">
 
-            <div class="form-group w-50" >
+        <div class="p-2 row">
+
+            <div class="form-group w-50 col-sm">
                 <h3>Buscar correos: </h1>
                     <textarea class="form-control" id="textAreaCorreos" rows="10"></textarea>
-                    <div class="form-box" >
+                    <div class="form-box">
                         <div class="p-2">
                             <a class="btn btn-primary" id="searchCorreos"> Buscar</a>
                         </div>
@@ -93,8 +228,18 @@
                         </div>
                     </div>
             </div>
+            <div id="div-errores" class=" w-50 col-sm">
 
-        </form>
+
+            </div>
+        </div>
     </div>
-<footer> Buscador V1.0.0 22-Jul-22</footer>
+    <footer class="py-3 my-4"> Buscador V1.0.0 22-Jul-22</footer>
 </body>
+<!-- 
+hola@hola.com;
+hola@google.com 
+
+hola@notExist.com 
+
+-->
