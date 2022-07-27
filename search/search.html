@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<header>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <style>
+        .form-box {
+            display: flex;
+            width: 100%;
+        }
+    </style>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        $(document).ready(function () {
+
+            $("#search").click(async () => {
+
+                let busquedas = $("#textArea").val().split('\n').filter(x => x);
+                for (const busqueda of busquedas) {
+                    window.open(`https://www.google.com/search?q=${busqueda}`, '_blank');
+                    await sleep(1000);
+                }
+            })
+
+
+            $("#searchCorreos").click(function () {
+
+                let busquedas = $("#textAreaCorreos").val()
+                    .split('\n')
+                    .filter(x => x)
+                    .map(x => x.split("@")[1]);
+                const allowRepeat = $("#allowRepeat").prop("checked");
+                if (!allowRepeat) {
+                    busquedas = new Set(busquedas);
+                }
+                const isDirect = $("#openDomain").prop("checked");
+                for (const busqueda of busquedas) {
+                    if (!isDirect) {
+
+                        window.open(`https://www.google.com/search?q=${busqueda}`, '_blank');
+                    }
+                    else {
+                        window.open(`https://${busqueda}`, '_blank');
+                    }
+                    await sleep(1000);
+                }
+            })
+        });
+    </script>
+</header>
+
+<body>
+    <div class="p-2">
+        <form>
+
+            <div class="form-group w-50">
+                <h3>Buscar Frases: </h1>
+                    <textarea class="form-control" id="textArea" rows="10"></textarea>
+            </div>
+            <div class="d-inline-flex">
+
+                <a class="btn btn-primary" id="search"> Buscar</a>
+            </div>
+        </form>
+    </div>
+    <div class="p-2">
+        <form>
+
+            <div class="form-group w-50" >
+                <h3>Buscar correos: </h1>
+                    <textarea class="form-control" id="textAreaCorreos" rows="10"></textarea>
+                    <div class="form-box" >
+                        <div class="p-2">
+                            <a class="btn btn-primary" id="searchCorreos"> Buscar</a>
+                        </div>
+                        <div class="p-2">
+                            <input type="checkbox" id="openDomain" checked>
+                            <label for="openDomain">Directo</label>
+                        </div>
+                        <div class="p-2">
+                            <input type="checkbox" id="allowRepeat" checked>
+                            <label for="allowRepeat">Repetidos</label>
+                        </div>
+                    </div>
+            </div>
+
+        </form>
+    </div>
+<footer> Buscador V1.0.0 22-Jul-22</footer>
+</body>
