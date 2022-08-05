@@ -124,7 +124,8 @@
             }
             url = busqueda;
             urlbk = url;
-            url = `https://www.google.com/search?q=${busqueda}`;
+            
+                url = `https://www.google.com/search?q=${busqueda}`;
             window.open(url, '_blank');
             return { success: true }
         }
@@ -160,15 +161,34 @@
             }
         }
 
-        async function searchFrases() {
+         function readTextBox(){
+            const allowRepeat = $("#allowRepeat").prop("checked");
+
             let busquedas = $("#text-area-search").val()
                 .split('\n')
+                .map(x=>x.trim())
                 .filter(x => x);
             if (!allowRepeat) {
                 busquedas = new Set(busquedas);
             }
+            return busquedas;
+         }
+
+
+        async function searchFrases() {
+            let busquedas = readTextBox();
             for (const busqueda of busquedas) {
                 window.open(`https://www.google.com/search?q=${busqueda}`, '_blank');
+                await sleep();
+            }
+        }
+
+        async function searchMaps() {
+            let busquedas = readTextBox();
+           
+            for (const busqueda of busquedas) {
+                const url = `https://www.google.com.mx/maps/place/${busqueda}`;
+                window.open(url, '_blank');
                 await sleep();
             }
         }
@@ -177,8 +197,12 @@
 
             $("#search").click(async () => {
                 const isFrases = $("#frases").prop("checked")
+                const maps = $("#maps").prop("checked");
                 if (isFrases) {
                     await searchFrases();
+                }
+                else if (maps){
+                    await searchMaps();
                 }
                 else {
                     await searchCorreos();
@@ -187,6 +211,19 @@
             })
             $("#frases").change(function () {
                 if (this.checked) {
+                    $("#openDomain").prop('checked', false);
+                    $("#maps").prop('checked', false);
+                }
+            });
+            $("#openDomain").change(function () {
+                if (this.checked) {
+                    $("#frases").prop('checked', false);
+                    $("#maps").prop('checked', false);
+                }
+            });
+            $("#maps").change(function () {
+                if (this.checked) {
+                    $("#frases").prop('checked', false);
                     $("#openDomain").prop('checked', false);
                 }
             });
@@ -214,6 +251,10 @@
                             <div class="p-2">
                                 <input type="checkbox" id="frases">
                                 <label for="frases">Frases</label>
+                            </div>
+                            <div class="p-2">
+                                <input type="checkbox" id="maps">
+                                <label for="maps">Maps</label>
                             </div>
                             <div class="p-2">
                                 <input type="checkbox" id="allowRepeat" checked>
